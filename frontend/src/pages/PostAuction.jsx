@@ -1,55 +1,80 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createAuction } from "../api/auction"; // Ensure this file exists
 import "./PostAuction.css";
 
-const PostAuction = ({ addAuction }) => {
-  const [itemName, setItemName] = useState("");
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [auctionTime, setAuctionTime] = useState("");
-  const [image, setImage] = useState(null);
+const PostAuction = () => {
+  const [formData, setFormData] = useState({
+    itemName: "",
+    description: "",
+    amount: "",
+    auctionTime: "",
+    image: null,
+  });
 
+  const [preview, setPreview] = useState(null);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleImageUpload = (e) => {
-    setImage(URL.createObjectURL(e.target.files[0]));
+  // Handle input changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // Handle image upload
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    setFormData({ ...formData, image: file });
+    setPreview(URL.createObjectURL(file));
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!itemName || !description || !amount || !auctionTime || !image) {
-      alert("All fields are required!");
+    setError("");
+
+    const token = localStorage.getItem("token"); // Get token
+
+    if (!token) {
+      setError("Unauthorized: No token found");
       return;
     }
-    else{
-      alert("Item added Successfully!")
+
+    // Convert to FormData
+    const auctionData = new FormData();
+    auctionData.append("itemName", formData.itemName);
+    auctionData.append("description", formData.description);
+    auctionData.append("amount", formData.amount);
+    auctionData.append("auctionTime", formData.auctionTime);
+    auctionData.append("image", formData.image);
+
+    try {
+      const response = await createAuction(auctionData, token); // Pass token
+      console.log("Auction Response:", response);
+
+      if (response.error) {
+        setError(response.error);
+      } else {
+        alert("Auction posted successfully!");
+        navigate("/auction-details");
+      }
+    } catch (err) {
+      console.error("Auction creation failed:", err);
+      setError("Auction creation failed. Please try again.");
     }
-
-    const newAuction = {
-      id: Date.now(),
-      itemName,
-      description,
-      amount: parseFloat(amount),
-      auctionTime,
-      image,
-      highestBid: parseFloat(amount),
-      winner: "",
-    };
-
-    addAuction(newAuction);
-    navigate("/auction-details");
   };
 
   return (
     <div className="post-auction-container">
       <h2>Post an Auction</h2>
+      {error && <p className="error-msg">{error}</p>}
       <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Item Name" value={itemName} onChange={(e) => setItemName(e.target.value)} required />
-        <textarea placeholder="Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
-        <input type="number" placeholder="Starting Amount (₹)" value={amount} onChange={(e) => setAmount(e.target.value)} required />
-        <input type="datetime-local" value={auctionTime} onChange={(e) => setAuctionTime(e.target.value)} required />
+        <input type="text" name="itemName" placeholder="Item Name" value={formData.itemName} onChange={handleChange} required />
+        <textarea name="description" placeholder="Description" value={formData.description} onChange={handleChange} required />
+        <input type="number" name="amount" placeholder="Starting Amount (₹)" value={formData.amount} onChange={handleChange} required />
+        <input type="datetime-local" name="auctionTime" value={formData.auctionTime} onChange={handleChange} required />
         <input type="file" accept="image/*" onChange={handleImageUpload} required />
-        {image && <img src={image} alt="Auction Preview" className="preview-image" />}
+        {preview && <img src={preview} alt="Auction Preview" className="preview-image" />}
         <button type="submit">Post Auction</button>
       </form>
     </div>

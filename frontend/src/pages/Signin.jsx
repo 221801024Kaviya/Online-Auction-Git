@@ -1,22 +1,45 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc"; // Google icon
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import { loginUser } from "../api/auth"; // Import API function
 import "./Signin.css";
 
 const Signin = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+
+  // Handle input changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    const response = await loginUser(formData);
+
+    if (response.error) {
+      setError(response.error);
+    } else {
+      localStorage.setItem("token", response.token); // Store token in localStorage
+      localStorage.setItem("userId", response.userId);
+      navigate("/dashboard"); // Redirect to Dashboard
+    }
+  };
+
   return (
     <div className="signin-container">
       <div className="signin-box">
         <h2>Sign In</h2>
-        <form>
-          <input type="email" placeholder="Email" required />
-          <input type="password" placeholder="Password" required />
+        {error && <p className="error-msg">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <input type="email" name="email" placeholder="Email" required onChange={handleChange} />
+          <input type="password" name="password" placeholder="Password" required onChange={handleChange} />
 
           <div className="signin-options">
-            {/* <label>
-              <input type="checkbox"/>Remember Me
-            </label> */}
-
             <Link to="/forgot-password" className="forgot-password">
               Forgot Password?
             </Link>
@@ -31,7 +54,7 @@ const Signin = () => {
 
         <div className="google-signin">
           <button className="google-btn">
-            <FcGoogle className="google-icon" /> Signin with Google
+            <FcGoogle className="google-icon" /> Sign in with Google
           </button>
         </div>
       </div>

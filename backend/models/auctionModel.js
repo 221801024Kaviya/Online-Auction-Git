@@ -13,14 +13,17 @@
 // module.exports = mongoose.model('Auction', auctionSchema);
 
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const auctionSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    startingBid: Number,
-    endTime: Date,
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    itemName: { type: String, required: true },
+    description: { type: String, required: true },
+    amount: { type: Number, required: true },
+    auctionTime: { type: String, required: true },
+    image: { type: String, required: true },
+    highestBid: { type: Number, required: true },
+    winner: { type: String, default: "" },
 });
 
-module.exports = mongoose.model('Auction', auctionSchema);
+module.exports = mongoose.model("Auction", auctionSchema);
+

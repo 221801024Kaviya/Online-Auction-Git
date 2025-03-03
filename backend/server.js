@@ -33,6 +33,8 @@ app.use(cors());
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/auctions', require('./routes/auctionRoutes'));
 app.use('/api/bids', require('./routes/bidRoutes'));
+app.use("/uploads", express.static("uploads"));
+
 
 // app.listen(5000, () => console.log(`Server running on port 5000`));
 
