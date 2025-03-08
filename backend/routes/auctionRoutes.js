@@ -1,14 +1,3 @@
-// const express = require('express');
-// const { getAuctions, createAuction } = require('../controllers/auctionController');
-// const authMiddleware = require('../middleware/authMiddleware');
-
-// const router = express.Router();
-
-// router.get('/', getAuctions);
-// router.post('/', authMiddleware, createAuction);
-
-// module.exports = router;
-
 const express = require("express");
 const multer = require("multer");
 const { createAuction, getAllAuctions,closeAuction,getWinners} = require('../controllers/auctionController');
@@ -19,7 +8,7 @@ const router = express.Router();
 // Multer setup for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "uploads/"); // Store images in 'uploads' folder
+        cb(null, "uploads/"); 
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + "-" + file.originalname);

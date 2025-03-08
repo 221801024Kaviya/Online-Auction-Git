@@ -3,9 +3,9 @@ export const createAuction = async (formData, token) => {
       const response = await fetch("http://localhost:5000/api/auctions/create", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`, // ✅ Include token in header
+          "Authorization": `Bearer ${token}`, 
         },
-        body: formData, // ✅ Send FormData (image upload support)
+        body: formData, 
       });
   
       if (!response.ok) {

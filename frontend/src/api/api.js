@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const API_URL = "/api"; // Since proxy is set up, we don’t need full URL
-
+const API_URL = "/api"; 
 // Get all auctions
 export const getAllAuctions = async () => {
     try {

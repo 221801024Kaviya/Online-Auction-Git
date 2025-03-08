@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "/api/users"; // Proxy is set in Vite config
+const API_URL = "/api/users"; 
 
 // Register user
 export const registerUser = async (userData) => {
@@ -17,7 +17,7 @@ export const registerUser = async (userData) => {
 export const loginUser = async (userData) => {
     try {
         const response = await axios.post(`${API_URL}/login`, userData);
-        return response.data; // Returns token & userId
+        return response.data; 
     } catch (error) {
         return { error: error.response?.data?.error || "Login failed" };
     }

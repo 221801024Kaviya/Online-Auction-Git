@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { loginUser } from "../api/auth"; // Import API function
+import { loginUser } from "../api/auth"; 
 import "./Signin.css";
 
 const Signin = () => {
@@ -9,12 +9,9 @@ const Signin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
-  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -24,9 +21,9 @@ const Signin = () => {
     if (response.error) {
       setError(response.error);
     } else {
-      localStorage.setItem("token", response.token); // Store token in localStorage
+      localStorage.setItem("token", response.token); 
       localStorage.setItem("userId", response.userId);
-      navigate("/dashboard"); // Redirect to Dashboard
+      navigate("/dashboard"); 
     }
   };
 

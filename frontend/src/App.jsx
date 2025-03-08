@@ -11,10 +11,10 @@ import AuctionDetails from "./pages/AuctionDetails";
 // import PlaceBid from "./components/PlaceBid";
 import Logout from "./pages/Logout";
 
-// Layout Wrapper (Excludes Landing, Signup, Signin)
+
 const Layout = ({ children }) => (
   <div className="app-container">
-    <Navbar /> {/* Navbar displayed only on required pages */}
+    <Navbar /> 
     <div className="content">{children}</div>
   </div>
 );
@@ -23,13 +23,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Pages WITHOUT Navbar */}
+
         <Route path="/" element={<Landing />} />
         <Route path="/signup" element={<Signup />} />
         <Route element={<PrivateRoute />}></Route>
         <Route path="/signin" element={<Signin />} />
 
-        {/* Pages WITH Navbar */}
         <Route
           path="/*"
           element={

@@ -2,7 +2,9 @@
   text-align: center;
   padding: 20px;
 }
-
+.dashboard-container h2{
+  margin-left: 200px;
+}
 .auction-list {
   display: flex;
   flex-wrap: wrap;

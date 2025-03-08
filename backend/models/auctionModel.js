@@ -1,18 +1,3 @@
-// const mongoose = require('mongoose');
-
-// const auctionSchema = new mongoose.Schema({
-//     itemName: { type: String, required: true },
-//     description: { type: String },
-//     startingBid: { type: Number, required: true },
-//     highestBid: { type: Number, default: 0 },
-//     highestBidder: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-//     auctionEndTime: { type: Date, required: true },
-//     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
-// }, { timestamps: true });
-
-// module.exports = mongoose.model('Auction', auctionSchema);
-
-
 const mongoose = require("mongoose");
 
 const auctionSchema = new mongoose.Schema({
@@ -23,6 +8,11 @@ const auctionSchema = new mongoose.Schema({
     image: { type: String, required: true },
     highestBid: { type: Number, required: true },
     winner: { type: String, default: "" },
+    status: {
+        type: String,
+        enum: ['active', 'closed'],
+        default: 'active'
+    }
 });
 
 module.exports = mongoose.model("Auction", auctionSchema);

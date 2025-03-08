@@ -27,28 +27,14 @@ const createAuction = async (req, res) => {
     }
 };
 
-// // Get all auctions
-// const getAuctions = async (req, res) => {
-//     try {
-//         const auctions = await Auction.find();
-//         res.json(auctions);
-//     } catch (error) {
-//         res.status(500).json({ error: "Failed to fetch auctions" });
-//     }
-// };
-
-// const getAllAuctions = async (req, res) => {
-//     try {
-//         const auctions = await Auction.find();
-//         res.json(auctions);
-//     } catch (error) {
-//         res.status(500).json({ message: "Server error", error: error.message });
-//     }
-// };
-
 const getAllAuctions = async (req, res) => {
     try {
-        const auctions = await Auction.find().select("itemName description amount auctionTime image currentBid");
+        const auctions = await Auction.find()
+            .select("itemName description amount auctionTime image highestBid winner status")
+            .populate('winner', 'username email') // Add this line to get winner details
+            .sort({ createdAt: -1 });
+        
+        console.log("Fetched auctions:", auctions);
         res.status(200).json(auctions);
     } catch (error) {
         console.error("Error fetching auctions:", error);
@@ -64,23 +50,39 @@ const closeAuction = async (req, res) => {
         const auction = await Auction.findById(auctionId);
         if (!auction) return res.status(404).json({ message: "Auction not found" });
 
-        if (auction.endTime > new Date()) {
+        // Check if auction has ended
+        const now = new Date();
+        const auctionEndTime = new Date(auction.auctionTime);
+        
+        if (auctionEndTime > now) {
             return res.status(400).json({ message: "Auction is still active" });
         }
 
-        const highestBid = await Bid.findOne({ auction: auctionId }).sort({ bidAmount: -1 });
-
-        auction.winner = highestBid ? highestBid.user : null;
-        await auction.save();
-
-        res.status(200).json({
-            message: "Auction closed successfully",
-            winner: highestBid ? highestBid.user : "No winner",
-        });
+        if (auction.highestBid > auction.amount) {
+            auction.status = 'closed';
+            await auction.save();
+            
+            console.log(`Auction ${auctionId} closed with winner:`, auction.winner);
+            res.status(200).json({
+                message: "Auction closed successfully",
+                winner: auction.winner
+            });
+        } else {
+            auction.status = 'closed';
+            auction.winner = null;
+            await auction.save();
+            
+            res.status(200).json({
+                message: "Auction closed with no winner",
+                winner: null
+            });
+        }
     } catch (error) {
+        console.error("Error closing auction:", error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
 };
+
 
 //get winners
 const getWinners = async (req, res) => {
@@ -94,5 +96,33 @@ const getWinners = async (req, res) => {
     }
 };
 
+const updateBid = async (req, res) => {
+    try {
+        const { auctionId } = req.params;
+        const { bidAmount, userId } = req.body;
 
-module.exports = { createAuction, getAllAuctions, closeAuction, getWinners };
+        const auction = await Auction.findById(auctionId);
+        if (!auction) {
+            return res.status(404).json({ message: "Auction not found" });
+        }
+
+        if (new Date(auction.auctionTime) < new Date()) {
+            return res.status(400).json({ message: "Auction has ended" });
+        }
+        if (bidAmount <= auction.highestBid) {
+            return res.status(400).json({ message: "Bid must be higher than current highest bid" });
+        }
+
+        auction.highestBid = bidAmount;
+        auction.winner = userId;
+        await auction.save();
+
+        console.log(`Bid updated for auction ${auctionId}:`, auction);
+        res.status(200).json({ message: "Bid updated successfully", auction });
+    } catch (error) {
+        console.error("Error updating bid:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+module.exports = { createAuction, getAllAuctions, closeAuction, getWinners,updateBid };
