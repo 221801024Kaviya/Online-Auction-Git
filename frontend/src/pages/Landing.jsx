@@ -5,13 +5,11 @@ import "./Landing.css";
 const Landing = () => {
   return (
     <div className="landing-container">
-      {/* Top Navigation for SignUp & Login */}
       <div className="top-nav">
         <Link to="/signup" className="nav-button">Signup</Link>
         <Link to="/signin" className="nav-button">Login</Link>
       </div>
 
-      {/* Main Content */}
       <div className="landing-content">
         <h1 className="title">Online Auction System</h1>
         <p className="quote">"The best place to bid and win exclusive items!"</p>
@@ -24,7 +22,6 @@ const Landing = () => {
         </p>
       </div>
 
-      {/* Start Bidding Button */}
       <div className="start-bidding-container">
         <Link to="/signup" className="start-bidding">Start Bidding</Link>
       </div>
